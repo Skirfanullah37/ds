@@ -1,0 +1,31 @@
+#include <stdio.h>
+
+void checkOddEven(int num) {
+    if (num % 2 == 0) {
+        printf("%d is even.\n", num);
+    } else {
+        printf("%d is odd.\n", num);
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int numbers[n]; // Array to store the elements
+
+   
+    printf("Enter %d elements:\n", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &numbers[i]);
+    }
+
+   
+    printf("Odd/Even check:\n");
+    for (int i = 0; i < n; i++) {
+        checkOddEven(numbers[i]);
+    }
+
+    return 0;
+}
