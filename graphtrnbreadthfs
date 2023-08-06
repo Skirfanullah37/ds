@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Queue {
+    int front, rear, size;
+    unsigned capacity;
+    int* array;
+};
+
+struct Queue* createQueue(unsigned capacity) {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->capacity = capacity;
+    queue->front = queue->size = 0;
+    queue->rear = capacity - 1;
+    queue->array = (int*)malloc(queue->capacity * sizeof(int));
+    return queue;
+}
+
+int isFull(struct Queue* queue) {
+    return (queue->size == queue->capacity);
+}
+
+int isEmpty(struct Queue* queue) {
+    return (queue->size == 0);
+}
+
+void enqueue(struct Queue* queue, int item) {
+    if (isFull(queue))
+        return;
+    queue->rear = (queue->rear + 1) % queue->capacity;
+    queue->array[queue->rear] = item;
+    queue->size = queue->size + 1;
+}
+
+int dequeue(struct Queue* queue) {
+    if (isEmpty(queue))
+        return -1;
+    int item = queue->array[queue->front];
+    queue->front = (queue->front + 1) % queue->capacity;
+    queue->size = queue->size - 1;
+    return item;
+}
+
+struct Graph {
+    int V; // Number of vertices
+    int** adjList; // Adjacency list
+};
+
+struct Graph* createGraph(int V) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->adjList = (int**)malloc(V * sizeof(int*));
+    for (int i = 0; i < V; i++) {
+        graph->adjList[i] = NULL;
+    }
+    return graph;
+}
+
+void addEdge(struct Graph* graph, int v, int w) {
+    graph->adjList[v] = (int*)realloc(graph->adjList[v], 2 * sizeof(int));
+    graph->adjList[v][0] = w;
+    graph->adjList[v][1] = -1;
+}
+
+void BFS(struct Graph* graph, int startVertex) {
+    struct Queue* queue = createQueue(graph->V);
+
+    int* visited = (int*)malloc(graph->V * sizeof(int));
+    for (int i = 0; i < graph->V; i++)
+        visited[i] = 0;
+
+    visited[startVertex] = 1;
+    enqueue(queue, startVertex);
+
+    printf("Breadth-First Search Traversal: ");
+    while (!isEmpty(queue)) {
+        int vertex = dequeue(queue);
+        printf("%d ", vertex);
+
+        for (int i = 0; graph->adjList[vertex][i] != -1; i++) {
+            int adjVertex = graph->adjList[vertex][i];
+            if (!visited[adjVertex]) {
+                visited[adjVertex] = 1;
+                enqueue(queue, adjVertex);
+            }
+        }
+    }
+
+    free(queue);
+    free(visited);
+}
+
+int main() {
+    int V, E, v, w, startVertex;
+    printf("Enter the number of vertices: ");
+    scanf("%d", &V);
+    struct Graph* graph = createGraph(V);
+    printf("Enter the number of edges: ");
+    scanf("%d", &E);
+    printf("Enter the edges (vertex v -> vertex w):\n");
+    for (int i = 0; i < E; i++) {
+        scanf("%d %d", &v, &w);
+        addEdge(graph, v, w);
+        addEdge(graph, w, v); // For an undirected graph, add the reverse edge as well
+    }
+    printf("Enter the start vertex for BFS traversal: ");
+    scanf("%d", &startVertex);
+
+    BFS(graph, startVertex);
+
+    for (int i = 0; i < V; i++)
+        free(graph->adjList[i]);
+    free(graph->adjList);
+    free(graph);
+
+    return 0;
+}
